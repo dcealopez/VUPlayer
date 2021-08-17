@@ -16,7 +16,7 @@ class Settings
 public:
 	// 'database' - application database.
 	// 'library' - media library.
-	// 'settings' - initial settings, used when running in 'portable' mode. 
+	// 'settings' - initial settings, used when running in 'portable' mode.
 	Settings( Database& database, Library& library, const std::string& settings = std::string() );
 
 	virtual ~Settings();
@@ -453,8 +453,14 @@ public:
 	// Sets whether the 'toolbarID' is 'enabled'.
 	void SetToolbarEnabled( const int toolbarID, const bool enabled );
 
+	// Returns whether to start playing on program startup
+	bool GetPlayOnStartup();
+
 	// Returns whether duplicate tracks are merged (for Artist/Album/Genre/Year playlists).
 	bool GetMergeDuplicates();
+
+	// Sets wheter to start playing on startup
+	void SetPlayOnStartup( const bool playOnStartup );
 
 	// Sets whether duplicate tracks are merged (for Artist/Album/Genre/Year playlists).
 	void SetMergeDuplicates( const bool mergeDuplicates );

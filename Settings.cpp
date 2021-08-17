@@ -255,7 +255,7 @@ void Settings::UpdateFontSettings()
 	if ( nullptr != dc ) {
 		ReleaseDC( 0, dc );
 	}
-	
+
 	if ( currentLogPixels > 0 ) {
 		sqlite3* database = m_Database.GetDatabase();
 		if ( nullptr != database ) {
@@ -1943,7 +1943,7 @@ void Settings::SetHotkeySettings( const bool enable, const HotkeyList& hotkeys )
 
 		query = "DELETE FROM Hotkeys;";
 		sqlite3_exec( database, query.c_str(), NULL /*callback*/, NULL /*arg*/, NULL /*errMsg*/ );
-		
+
 		if ( !hotkeys.empty() ) {
 			stmt = nullptr;
 			query = "INSERT INTO Hotkeys (ID,Hotkey,Alt,Ctrl,Shift,Keyname) VALUES (?1,?2,?3,?4,?5,?6);";
@@ -2404,6 +2404,23 @@ void Settings::SetToolbarEnabled( const int toolbarID, const bool enabled )
 	}
 }
 
+bool Settings::GetPlayOnStartup()
+{
+	bool playOnStartup = false;
+	sqlite3* database = m_Database.GetDatabase();
+	if (nullptr != database) {
+		sqlite3_stmt* stmt = nullptr;
+		const std::string query = "SELECT Value FROM Settings WHERE Setting='PlayOnStartup';";
+		if (SQLITE_OK == sqlite3_prepare_v2(database, query.c_str(), -1 /*nByte*/, &stmt, nullptr /*tail*/)) {
+			if (SQLITE_ROW == sqlite3_step(stmt)) {
+				playOnStartup = (0 != sqlite3_column_int(stmt, 0 /*columnIndex*/));
+			}
+			sqlite3_finalize(stmt);
+		}
+	}
+	return playOnStartup;
+}
+
 bool Settings::GetMergeDuplicates()
 {
 	bool mergeDuplicates = false;
@@ -2419,6 +2436,22 @@ bool Settings::GetMergeDuplicates()
 		}
 	}
 	return mergeDuplicates;
+}
+
+void Settings::SetPlayOnStartup(const bool playOnStartup)
+{
+	sqlite3* database = m_Database.GetDatabase();
+	if (nullptr != database) {
+		const std::string query = "REPLACE INTO Settings (Setting,Value) VALUES (?1,?2);";
+		sqlite3_stmt* stmt = nullptr;
+		if (SQLITE_OK == sqlite3_prepare_v2(database, query.c_str(), -1 /*nByte*/, &stmt, nullptr /*tail*/)) {
+			sqlite3_bind_text(stmt, 1, "PlayOnStartup", -1 /*strLen*/, SQLITE_STATIC);
+			sqlite3_bind_int(stmt, 2, playOnStartup);
+			sqlite3_step(stmt);
+			sqlite3_reset(stmt);
+			sqlite3_finalize(stmt);
+		}
+	}
 }
 
 void Settings::SetMergeDuplicates( const bool mergeDuplicates )

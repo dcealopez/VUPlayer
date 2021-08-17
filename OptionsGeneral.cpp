@@ -55,6 +55,12 @@ void OptionsGeneral::OnInit( const HWND hwnd )
 	// Miscellaneous settings
 	VUPlayer* vuplayer = VUPlayer::Get();
 
+	const bool playOnStartup = GetSettings().GetPlayOnStartup();
+	const HWND hwndPlayOnStartup = GetDlgItem( hwnd, IDC_OPTIONS_PLAY_ON_STARTUP );
+	if (nullptr != hwndPlayOnStartup) {
+		Button_SetCheck( hwndPlayOnStartup, ( playOnStartup ? BST_CHECKED : BST_UNCHECKED ) );
+	}
+
 	const bool mergeDuplicates = GetSettings().GetMergeDuplicates();
 	const HWND hwndMergeDuplicates = GetDlgItem( hwnd, IDC_OPTIONS_GENERAL_HIDEDUPLICATES );
 	if ( nullptr != hwndMergeDuplicates ) {
@@ -83,10 +89,10 @@ void OptionsGeneral::OnInit( const HWND hwnd )
 	// Notification area settings
 	bool systrayEnable = false;
 	bool systrayMinimise = false;
-	std::array clickActions { 
-		Settings::SystrayCommand::None, 
-		Settings::SystrayCommand::None, 
-		Settings::SystrayCommand::None, 
+	std::array clickActions {
+		Settings::SystrayCommand::None,
+		Settings::SystrayCommand::None,
+		Settings::SystrayCommand::None,
 		Settings::SystrayCommand::None
 	};
 	GetSettings().GetSystraySettings( systrayEnable, systrayMinimise, clickActions[ 0 ], clickActions[ 1 ], clickActions[ 2 ], clickActions[ 3 ] );
@@ -121,7 +127,7 @@ void OptionsGeneral::OnInit( const HWND hwnd )
 			LoadString( instance, IDS_OPTIONS_SYSTRAY_SHOWHIDE, buffer, bufferSize );
 			ComboBox_AddString( hwndClick, buffer );
 			ComboBox_SetCurSel( hwndClick, static_cast<int>( clickAction ) );
-		}	
+		}
 	}
 
 	EnableSystrayControls( hwnd );
@@ -135,6 +141,9 @@ void OptionsGeneral::OnSave( const HWND hwnd )
 	GetSettings().SetOutputSettings( device, mode );
 
 	// Miscellaneous settings
+	const bool playOnStartup = ( BST_CHECKED == Button_GetCheck( GetDlgItem( hwnd, IDC_OPTIONS_PLAY_ON_STARTUP ) ) );
+	GetSettings().SetPlayOnStartup( playOnStartup );
+
 	const bool mergeDuplicates = ( BST_CHECKED == Button_GetCheck( GetDlgItem( hwnd, IDC_OPTIONS_GENERAL_HIDEDUPLICATES ) ) );
 	GetSettings().SetMergeDuplicates( mergeDuplicates );
 
@@ -232,7 +241,7 @@ void OptionsGeneral::RefreshOutputDeviceList( const HWND hwnd )
 			HWND hwndAdvanced = GetDlgItem( hwnd, IDC_OPTIONS_MODE_ADVANCED );
 			if ( nullptr != hwndAdvanced ) {
 				if ( Settings::OutputMode::Standard != GetSelectedMode( hwnd ) ) {
-					EnableWindow( hwndAdvanced, TRUE );				
+					EnableWindow( hwndAdvanced, TRUE );
 				} else {
 					EnableWindow( hwndAdvanced, FALSE );
 				}

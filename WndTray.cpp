@@ -54,7 +54,7 @@ WndTray::WndTray( HINSTANCE instance, HWND parent, Library& library, Settings& s
 	m_NotifyIconData.hWnd = parent;
 	m_NotifyIconData.uCallbackMessage = MSG_TRAYNOTIFY;
 	m_NotifyIconData.uVersion = NOTIFYICON_VERSION_4;
-	m_NotifyIconData.guidItem = GenerateGUID();
+
 	LoadIconMetric( instance, MAKEINTRESOURCE( IDI_VUPLAYER ), LIM_SMALL, &m_NotifyIconData.hIcon );
 
 	LoadString( instance, IDS_APP_TITLE, m_NotifyIconData.szTip, sMaxTooltip );
@@ -62,7 +62,18 @@ WndTray::WndTray( HINSTANCE instance, HWND parent, Library& library, Settings& s
 
 	bool enable = false;
 	bool minimise = false;
-	m_Settings.GetSystraySettings( enable, minimise, m_ClickCommands[ 0 ], m_ClickCommands[ 1 ], m_ClickCommands[ 2 ], m_ClickCommands[ 3 ] );
+	UUID sysTrayUUID;
+	RPC_STATUS rpcStatus;
+
+	UuidCreateNil(&sysTrayUUID);
+	m_Settings.GetSystraySettings( enable, minimise, m_ClickCommands[ 0 ], m_ClickCommands[ 1 ], m_ClickCommands[ 2 ], m_ClickCommands[ 3 ], sysTrayUUID );
+
+	if ( UuidIsNil(&sysTrayUUID, &rpcStatus) ) {
+		sysTrayUUID = GenerateGUID();
+		m_Settings.SetSystraySettings(enable, minimise, m_ClickCommands[0], m_ClickCommands[1], m_ClickCommands[2], m_ClickCommands[3], &sysTrayUUID);
+	}
+
+	m_NotifyIconData.guidItem = sysTrayUUID;
 }
 
 WndTray::~WndTray()
@@ -181,8 +192,8 @@ void WndTray::OnNotify( WPARAM /*wParam*/, LPARAM lParam )
 			++m_ClickCount;
 			const auto [ singleClick, doubleClick, tripleClick, quadClick ] = m_ClickCommands;
 			if ( ( 4 == m_ClickCount ) || ( ( Settings::SystrayCommand::None == tripleClick ) && ( Settings::SystrayCommand::None == quadClick ) ) ) {
-				OnTimerElapsed();				
-			}				
+				OnTimerElapsed();
+			}
 			break;
 		}
 		case WM_CONTEXTMENU : {
@@ -489,7 +500,8 @@ void WndTray::OnChangeSettings()
 {
 	bool enable = false;
 	bool minimise = false;
-	m_Settings.GetSystraySettings( enable, minimise, m_ClickCommands[ 0 ], m_ClickCommands[ 1 ], m_ClickCommands[ 2 ], m_ClickCommands[ 3 ] );
+	UUID sysTrayUUID;
+	m_Settings.GetSystraySettings( enable, minimise, m_ClickCommands[ 0 ], m_ClickCommands[ 1 ], m_ClickCommands[ 2 ], m_ClickCommands[ 3 ], sysTrayUUID );
 }
 
 void WndTray::OnTimerElapsed()

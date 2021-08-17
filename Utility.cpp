@@ -4,7 +4,7 @@
 
 #include "Gdiplusimaging.h"
 
-#include <initguid.h> 
+#include <initguid.h>
 #include <Uxtheme.h>
 #include <VersionHelpers.h>
 #include "objbase.h"
@@ -281,7 +281,7 @@ void GetImageInformation( const std::string& image, std::string& mimeType, int& 
 
 					const Gdiplus::PixelFormat pixelFormat = bitmap.GetPixelFormat();
 					switch ( pixelFormat ) {
-						case PixelFormat4bppIndexed : { 
+						case PixelFormat4bppIndexed : {
 							depth = 4;
 							break;
 						}
@@ -352,7 +352,7 @@ void GetImageInformation( const std::string& image, std::string& mimeType, int& 
 				}
 			}
 			stream->Release();
-		}					
+		}
 	}
 }
 
@@ -361,6 +361,24 @@ GUID GenerateGUID()
 	UUID uuid = {};
 	UuidCreate( &uuid );
 	return uuid;
+}
+
+GUID GetGUIDFromString( const char* uuidStr )
+{
+	UUID uuid;
+	UuidFromStringA(reinterpret_cast<RPC_CSTR>(const_cast<char*>(uuidStr)), &uuid);
+	return uuid;
+}
+
+std::string GetGUIDAsString( UUID uuid )
+{
+	std::string result;
+	RPC_CSTR uuidStr;
+	if (RPC_S_OK == UuidToStringA(&uuid, &uuidStr)) {
+		result = reinterpret_cast<char*>(uuidStr);
+		RpcStringFreeA(&uuidStr);
+	}
+	return result;
 }
 
 std::string GenerateGUIDString()
@@ -389,7 +407,7 @@ std::string ConvertImage( const std::vector<BYTE>& imageBytes )
 					if ( Gdiplus::Ok == bitmap.GetRawFormat( &format ) ) {
 						if ( ( Gdiplus::ImageFormatPNG == format ) || ( Gdiplus::ImageFormatJPEG == format ) || ( Gdiplus::ImageFormatGIF == format ) ) {
 							encodedImage = Base64Encode( &imageBytes[ 0 ], static_cast<int>( imageSize ) );
-						} else {		
+						} else {
 							CLSID encoderClsid = {};
 							UINT numEncoders = 0;
 							UINT bufferSize = 0;
@@ -421,14 +439,14 @@ std::string ConvertImage( const std::vector<BYTE>& imageBytes )
 									}
 								}
 								encoderStream->Release();
-							}							
+							}
 						}
-					}					
+					}
 				} catch ( ... ) {
 				}
 			}
 			stream->Release();
-		}					
+		}
 	}
 	return encodedImage;
 }
@@ -715,7 +733,7 @@ HBITMAP CreateColourBitmap( const HINSTANCE instance, const UINT iconID, const i
 					bitmapInfo.bmiHeader.biPlanes = 1;
 					bitmapInfo.bmiHeader.biBitCount = 32;
 					bitmapInfo.bmiHeader.biCompression = BI_RGB;
-					std::vector<unsigned char> bits( bm.bmHeight * bm.bmWidth * 4 );				
+					std::vector<unsigned char> bits( bm.bmHeight * bm.bmWidth * 4 );
 					if ( GetDIBits( dc, iconInfo.hbmColor, 0, bm.bmHeight, bits.data(), &bitmapInfo, DIB_RGB_COLORS ) ) {
 						const unsigned char r = GetRValue( colour );
 						const unsigned char g = GetGValue( colour );

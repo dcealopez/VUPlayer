@@ -72,6 +72,12 @@ std::string ConvertImage( const std::vector<BYTE>& image );
 // Generates a GUID.
 GUID GenerateGUID();
 
+// Converts a string to an UUID
+GUID GetGUIDFromString(const char *uuidStr);
+
+// Converts a GUID to an UUID
+std::string GetGUIDAsString( UUID uuid );
+
 // Generates a GUID string.
 std::string GenerateGUIDString();
 
@@ -98,7 +104,7 @@ bool FolderExists( const std::wstring& folder );
 
 // Replaces invalid characters in 'filename' with 'replacement'.
 // 'replaceFolderDelimiters' - whether folder delimiters should be replaced.
-void WideStringReplaceInvalidFilenameCharacters( std::wstring& filename, const std::wstring& replacement, const bool replaceFolderDelimiters ); 
+void WideStringReplaceInvalidFilenameCharacters( std::wstring& filename, const std::wstring& replacement, const bool replaceFolderDelimiters );
 
 // Converts a 'gain' value to a string (returns an empty string if the gain is not valid).
 std::string GainToString( const std::optional<float> gain );

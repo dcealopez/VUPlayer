@@ -367,7 +367,7 @@ public:
 	// 'doubleClick' - out, double click action.
 	// 'tripleClick' - out, triple click action.
 	// 'quadClick' - out, quadruple click action.
-	void GetSystraySettings( bool& enable, bool& minimise, SystrayCommand& singleClick, SystrayCommand& doubleClick, SystrayCommand& tripleClick, SystrayCommand& quadClick );
+	void GetSystraySettings( bool& enable, bool& minimise, SystrayCommand& singleClick, SystrayCommand& doubleClick, SystrayCommand& tripleClick, SystrayCommand& quadClick, UUID& uuid );
 
 	// Sets notification area settings.
 	// 'enable' - whether the notification area icon is shown.
@@ -376,7 +376,7 @@ public:
 	// 'doubleClick' - double click action.
 	// 'tripleClick' - triple click action.
 	// 'quadClick' - quadruple click action.
-	void SetSystraySettings( const bool enable, const bool minimise, const SystrayCommand singleClick, const SystrayCommand doubleClick, const SystrayCommand tripleClick, const SystrayCommand quadClick );
+	void SetSystraySettings( const bool enable, const bool minimise, const SystrayCommand singleClick, const SystrayCommand doubleClick, const SystrayCommand tripleClick, const SystrayCommand quadClick, UUID *uuid );
 
 	// Gets playback settings.
 	// 'randomPlay' - whether random playback is enabled.

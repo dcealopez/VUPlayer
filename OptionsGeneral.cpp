@@ -89,13 +89,14 @@ void OptionsGeneral::OnInit( const HWND hwnd )
 	// Notification area settings
 	bool systrayEnable = false;
 	bool systrayMinimise = false;
+	UUID sysTrayUUID;
 	std::array clickActions {
 		Settings::SystrayCommand::None,
 		Settings::SystrayCommand::None,
 		Settings::SystrayCommand::None,
 		Settings::SystrayCommand::None
 	};
-	GetSettings().GetSystraySettings( systrayEnable, systrayMinimise, clickActions[ 0 ], clickActions[ 1 ], clickActions[ 2 ], clickActions[ 3 ] );
+	GetSettings().GetSystraySettings( systrayEnable, systrayMinimise, clickActions[ 0 ], clickActions[ 1 ], clickActions[ 2 ], clickActions[ 3 ], sysTrayUUID );
 	if ( HWND hwndEnable = GetDlgItem( hwnd, IDC_OPTIONS_GENERAL_SYSTRAY_ENABLE ); nullptr != hwndEnable ) {
 		Button_SetCheck( hwndEnable, ( systrayEnable ? BST_CHECKED : BST_UNCHECKED ) );
 	}
@@ -160,7 +161,7 @@ void OptionsGeneral::OnSave( const HWND hwnd )
 	const Settings::SystrayCommand doubleClick = static_cast<Settings::SystrayCommand>( ComboBox_GetCurSel( GetDlgItem( hwnd, IDC_OPTIONS_GENERAL_SYSTRAY_DOUBLECLICK ) ) );
 	const Settings::SystrayCommand tripleClick = static_cast<Settings::SystrayCommand>( ComboBox_GetCurSel( GetDlgItem( hwnd, IDC_OPTIONS_GENERAL_SYSTRAY_TRIPLECLICK ) ) );
 	const Settings::SystrayCommand quadClick = static_cast<Settings::SystrayCommand>( ComboBox_GetCurSel( GetDlgItem( hwnd, IDC_OPTIONS_GENERAL_SYSTRAY_QUADCLICK ) ) );
-	GetSettings().SetSystraySettings( enable, minimise, singleClick, doubleClick, tripleClick, quadClick );
+	GetSettings().SetSystraySettings( enable, minimise, singleClick, doubleClick, tripleClick, quadClick, nullptr );
 }
 
 void OptionsGeneral::OnCommand( const HWND hwnd, const WPARAM wParam, const LPARAM /*lParam*/ )

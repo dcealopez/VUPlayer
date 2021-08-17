@@ -197,24 +197,27 @@ void VUPlayer::ReadWindowSettings()
 
 	bool systrayEnable = false;
 	bool systrayMinimise = false;
+	UUID sysTrayUUID;
 	Settings::SystrayCommand systraySingleClick = Settings::SystrayCommand::None;
 	Settings::SystrayCommand systrayDoubleClick = Settings::SystrayCommand::None;
 	Settings::SystrayCommand systrayTripleClick = Settings::SystrayCommand::None;
 	Settings::SystrayCommand systrayQuadClick = Settings::SystrayCommand::None;
-	m_Settings.GetSystraySettings( systrayEnable, systrayMinimise, systraySingleClick, systrayDoubleClick, systrayTripleClick, systrayQuadClick );
-	if ( minimised ) {
-		ShowWindow( m_hWnd, SW_SHOWMINIMIZED );
-		if ( systrayEnable && systrayMinimise ) {
-			ShowWindow( m_hWnd, SW_HIDE );
-		}
-	} else if ( maximised ) {
-		ShowWindow( m_hWnd, SW_SHOWMAXIMIZED );
+	m_Settings.GetSystraySettings( systrayEnable, systrayMinimise, systraySingleClick, systrayDoubleClick, systrayTripleClick, systrayQuadClick, sysTrayUUID );
+
+	ShowWindow(m_hWnd, SW_SHOW);
+
+	if ( IsIconic(m_hWnd) && systrayMinimise && systrayEnable ) {
+		ShowWindow(m_hWnd, SW_HIDE);
 	} else {
-		ShowWindow( m_hWnd, SW_SHOW );
+		if ( maximised ) {
+			ShowWindow(m_hWnd, SW_MAXIMIZE);
+		}
 	}
+
 	if ( systrayEnable ) {
 		m_Tray.Show();
 	}
+
 	UpdateWindow( m_hWnd );
 
 	// Force the status bar to update.
@@ -266,11 +269,12 @@ void VUPlayer::OnSize( WPARAM wParam, LPARAM lParam )
 	if ( SIZE_MINIMIZED == wParam ) {
 		bool systrayEnable = false;
 		bool systrayMinimise = false;
+		UUID sysTrayUUID;
 		Settings::SystrayCommand systraySingleClick = Settings::SystrayCommand::None;
 		Settings::SystrayCommand systrayDoubleClick = Settings::SystrayCommand::None;
 		Settings::SystrayCommand systrayTripleClick = Settings::SystrayCommand::None;
 		Settings::SystrayCommand systrayQuadClick = Settings::SystrayCommand::None;
-		m_Settings.GetSystraySettings( systrayEnable, systrayMinimise, systraySingleClick, systrayDoubleClick, systrayTripleClick, systrayQuadClick );
+		m_Settings.GetSystraySettings( systrayEnable, systrayMinimise, systraySingleClick, systrayDoubleClick, systrayTripleClick, systrayQuadClick, sysTrayUUID );
 		if ( systrayEnable && systrayMinimise ) {
 			ShowWindow( m_hWnd, SW_HIDE );
 		}
@@ -1069,7 +1073,8 @@ void VUPlayer::OnCommand( const int commandID )
 				if ( !IsWindowVisible( m_hWnd ) ) {
 					ShowWindow( m_hWnd, SW_SHOWMINIMIZED );
 				}
-				ShowWindow( m_hWnd, SW_RESTORE );
+				ShowWindow(m_hWnd, SW_RESTORE);
+				ShowWindow(m_hWnd, SW_MAXIMIZE);
 			} else {
 				ShowWindow( m_hWnd, SW_MINIMIZE );
 			}
@@ -1480,11 +1485,12 @@ void VUPlayer::OnOptions()
 
 	bool systrayEnable = false;
 	bool systrayMinimise = false;
+	UUID sysTrayUUID;
 	Settings::SystrayCommand systraySingleClick = Settings::SystrayCommand::None;
 	Settings::SystrayCommand systrayDoubleClick = Settings::SystrayCommand::None;
 	Settings::SystrayCommand systrayTripleClick = Settings::SystrayCommand::None;
 	Settings::SystrayCommand systrayQuadClick = Settings::SystrayCommand::None;
-	m_Settings.GetSystraySettings( systrayEnable, systrayMinimise, systraySingleClick, systrayDoubleClick, systrayTripleClick, systrayQuadClick );
+	m_Settings.GetSystraySettings( systrayEnable, systrayMinimise, systraySingleClick, systrayDoubleClick, systrayTripleClick, systrayQuadClick, sysTrayUUID );
 	if ( !systrayEnable && m_Tray.IsShown() ) {
 		m_Tray.Hide();
 	} else if ( systrayEnable && !m_Tray.IsShown() ) {

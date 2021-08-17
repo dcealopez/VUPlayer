@@ -1678,7 +1678,7 @@ void Settings::SetGainSettings( const GainMode gainMode, const LimitMode limitMo
 	}
 }
 
-void Settings::GetSystraySettings( bool& enable, bool& minimise, SystrayCommand& singleClick, SystrayCommand& doubleClick, SystrayCommand& tripleClick, SystrayCommand& quadClick )
+void Settings::GetSystraySettings( bool& enable, bool& minimise, SystrayCommand& singleClick, SystrayCommand& doubleClick, SystrayCommand& tripleClick, SystrayCommand& quadClick, UUID& uuid )
 {
 	enable = false;
 	minimise = false;
@@ -1748,10 +1748,21 @@ void Settings::GetSystraySettings( bool& enable, bool& minimise, SystrayCommand&
 			}
 			sqlite3_finalize( stmt );
 		}
+		stmt = nullptr;
+		query = "SELECT Value FROM Settings WHERE Setting='SysTrayUUID';";
+		if (SQLITE_OK == sqlite3_prepare_v2(database, query.c_str(), -1 /*nByte*/, &stmt, nullptr /*tail*/)) {
+			if (SQLITE_ROW == sqlite3_step(stmt)) {
+				const char* text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0 /*columnIndex*/));
+				if (nullptr != text) {
+					uuid = GetGUIDFromString(text);
+				}
+			}
+			sqlite3_finalize(stmt);
+		}
 	}
 }
 
-void Settings::SetSystraySettings( const bool enable, const bool minimise, const SystrayCommand singleClick, const SystrayCommand doubleClick, const SystrayCommand tripleClick, const SystrayCommand quadClick )
+void Settings::SetSystraySettings( const bool enable, const bool minimise, const SystrayCommand singleClick, const SystrayCommand doubleClick, const SystrayCommand tripleClick, const SystrayCommand quadClick, UUID *uuid )
 {
 	sqlite3* database = m_Database.GetDatabase();
 	if ( nullptr != database ) {
@@ -1787,6 +1798,14 @@ void Settings::SetSystraySettings( const bool enable, const bool minimise, const
 			sqlite3_bind_int( stmt, 2, static_cast<int>( quadClick ) );
 			sqlite3_step( stmt );
 			sqlite3_reset( stmt );
+
+			if (nullptr != uuid) {
+				sqlite3_bind_text(stmt, 1, "SysTrayUUID", -1 /*strLen*/, SQLITE_STATIC);
+				std::string test = GetGUIDAsString(*uuid).c_str();
+				sqlite3_bind_text(stmt, 2, GetGUIDAsString(*uuid).c_str(), -1, SQLITE_TRANSIENT);
+				sqlite3_step(stmt);
+				sqlite3_reset(stmt);
+			}
 
 			sqlite3_finalize( stmt );
 			stmt = nullptr;

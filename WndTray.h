@@ -121,7 +121,7 @@ private:
 
 	// Tree control.
 	WndTree& m_Tree;
-	
+
 	// List control.
 	WndList& m_List;
 
@@ -136,4 +136,7 @@ private:
 
 	// The click count when the timer elapses.
 	int m_ClickCount;
+
+	// System tray icon UUID
+	UUID sysTrayUUID;
 };
